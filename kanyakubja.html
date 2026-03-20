@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanyakubja Ecological Restoration Initiative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #1C3A2A;
+    --forest-mid: #2E5C42;
+    --sage: #6B8F71;
+    --sage-light: #A8C5A0;
+    --earth: #8B6348;
+    --amber: #C9902A;
+    --cream: #F6F0E4;
+    --parchment: #EDE5D4;
+    --paper: #FAFAF7;
+    --text-dark: #1A1A14;
+    --text-mid: #3D3D30;
+    --text-light: #7A7A60;
+    --border: rgba(107,143,113,0.2);
+    --sidebar-w: 280px;
+    --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--text-dark);
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--sage), var(--amber));
+    width: 0%;
+    z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* ─── SIDEBAR ─── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--forest);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+  }
+
+  .sidebar-header {
+    padding: 36px 28px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    flex-shrink: 0;
+  }
+
+  .sidebar-header .leaf-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .sidebar-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--sage-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .sidebar-header p {
+    font-size: 11px;
+    color: rgba(168,197,160,0.55);
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  #nav-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 16px 0 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--forest-mid) transparent;
+  }
+
+  #nav-list::-webkit-scrollbar { width: 3px; }
+  #nav-list::-webkit-scrollbar-track { background: transparent; }
+  #nav-list::-webkit-scrollbar-thumb { background: var(--forest-mid); border-radius: 2px; }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 28px;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+    position: relative;
+  }
+
+  .nav-item:hover { background: rgba(168,197,160,0.07); }
+
+  .nav-item.active {
+    background: rgba(168,197,160,0.12);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--sage-light);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .nav-num {
+    font-size: 10px;
+    color: rgba(168,197,160,0.4);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+    flex-shrink: 0;
+    width: 18px;
+  }
+
+  .nav-item.active .nav-num { color: var(--sage-light); }
+
+  .nav-label {
+    font-size: 12.5px;
+    color: rgba(168,197,160,0.65);
+    line-height: 1.4;
+    transition: color var(--transition);
+  }
+
+  .nav-item.active .nav-label,
+  .nav-item:hover .nav-label { color: rgba(168,197,160,0.95); }
+
+  .sidebar-footer {
+    padding: 18px 28px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+  }
+
+  .sidebar-footer p {
+    font-size: 10px;
+    color: rgba(168,197,160,0.3);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  #main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    background: var(--forest);
+    position: relative;
+    overflow: hidden;
+    padding: 100px 80px 80px;
+    min-height: 480px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .hero-bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(46,92,66,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(107,143,113,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Botanical SVG decoration */
+  .hero-botanical {
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 680px; }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage-light);
+    border: 1px solid rgba(168,197,160,0.3);
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+
+  #hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(38px, 5vw, 58px);
+    font-weight: 300;
+    color: var(--cream);
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+
+  #hero h1 em {
+    font-style: italic;
+    color: var(--sage-light);
+  }
+
+  #hero h2 {
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: rgba(168,197,160,0.65);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 36px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(168,197,160,0.15);
+  }
+
+  .hero-stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .hero-stat-label {
+    font-size: 10px;
+    color: rgba(168,197,160,0.55);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ─── CHAPTER SECTIONS ─── */
+  .chapter {
+    padding: 80px 80px 72px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .chapter.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .chapter:nth-child(even) { background: var(--parchment); }
+  .chapter:nth-child(odd) { background: var(--paper); }
+
+  .chapter-header {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 10px;
+  }
+
+  .chapter-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 70px;
+    font-weight: 300;
+    color: rgba(107,143,113,0.12);
+    line-height: 0.85;
+    flex-shrink: 0;
+    user-select: none;
+    margin-left: -8px;
+  }
+
+  .chapter-title-block h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 600;
+    color: var(--forest);
+    line-height: 1.2;
+  }
+
+  .chapter-subtitle {
+    font-size: 12px;
+    color: var(--text-light);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .chapter-body {
+    max-width: 720px;
+    margin-top: 28px;
+  }
+
+  .chapter-body p {
+    font-size: 16.5px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    margin-bottom: 16px;
+  }
+
+  .chapter-body p strong { color: var(--forest); font-weight: 700; }
+
+  /* ─── PILL LIST ─── */
+  .pill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(107,143,113,0.1);
+    border: 1px solid rgba(107,143,113,0.2);
+    color: var(--forest-mid);
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-weight: 400;
+  }
+
+  .pill .dot {
+    width: 6px; height: 6px;
+    background: var(--sage);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── INFO GRID ─── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+  }
+
+  .info-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow var(--transition), transform var(--transition);
+  }
+
+  .info-card:hover {
+    box-shadow: 0 8px 32px rgba(28,58,42,0.1);
+    transform: translateY(-2px);
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--sage), var(--sage-light));
+  }
+
+  .info-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--forest);
+    margin-bottom: 8px;
+  }
+
+  .info-card p {
+    font-size: 14px !important;
+    color: var(--text-light) !important;
+    margin: 0 !important;
+    line-height: 1.55 !important;
+  }
+
+  /* ─── CARBON CHART ─── */
+  .carbon-viz {
+    background: var(--forest);
+    border-radius: 10px;
+    padding: 36px 32px;
+    margin: 32px 0;
+    color: white;
+  }
+
+  .carbon-viz h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--sage-light);
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+
+  .carbon-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 110px;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .carbon-label {
+    font-size: 12px;
+    color: rgba(168,197,160,0.75);
+    text-align: right;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+  }
+
+  .carbon-bar-track {
+    height: 10px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+
+  .carbon-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    width: 0%;
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .carbon-bar-fill.urban { background: linear-gradient(90deg, #4A8B5C, #7AC99A); }
+  .carbon-bar-fill.agro  { background: linear-gradient(90deg, #C9902A, #E8B84B); }
+  .carbon-bar-fill.wet   { background: linear-gradient(90deg, #3A7DA8, #6BAED6); }
+
+  .carbon-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .carbon-total-box {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .carbon-total-label { font-size: 12px; color: rgba(168,197,160,0.6); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .carbon-total-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--amber);
+  }
+
+  .carbon-total-sub { font-size: 11px; color: rgba(168,197,160,0.5); }
+
+  /* ─── TIMELINE ─── */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 32px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 9px; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--sage), var(--sage-light), rgba(168,197,160,0.2));
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 36px;
+    opacity: 0;
+    transform: translateX(-12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .tl-item.visible { opacity: 1; transform: translateX(0); }
+  .tl-item:nth-child(2) { transition-delay: 0.15s; }
+  .tl-item:nth-child(3) { transition-delay: 0.3s; }
+
+  .tl-dot {
+    position: absolute;
+    left: -28px; top: 4px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--forest);
+    border: 3px solid var(--sage);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .tl-dot span { width: 6px; height: 6px; background: var(--sage-light); border-radius: 50%; }
+
+  .tl-phase {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 6px;
+  }
+
+  .tl-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 8px;
+  }
+
+  .tl-body { font-size: 14.5px; color: var(--text-light); line-height: 1.65; }
+
+  .tl-tags {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+  }
+
+  .tl-tag {
+    font-size: 11px;
+    background: rgba(107,143,113,0.08);
+    border: 1px solid rgba(107,143,113,0.18);
+    color: var(--forest-mid);
+    padding: 3px 10px;
+    border-radius: 3px;
+  }
+
+  /* ─── CITY CARDS ─── */
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 18px;
+    margin: 28px 0;
+  }
+
+  .city-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    transition: box-shadow var(--transition), transform var(--transition);
+  }
+
+  .city-card:hover {
+    box-shadow: 0 12px 40px rgba(28,58,42,0.12);
+    transform: translateY(-3px);
+  }
+
+  .city-card-head {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .city-card-head.c1 { background: linear-gradient(135deg, #0B3D6B, #1A6BA0); }
+  .city-card-head.c2 { background: linear-gradient(135deg, #1A4A2E, #2D8A5C); }
+  .city-card-head.c3 { background: linear-gradient(135deg, #5C2D0B, #C05A20); }
+  .city-card-head.c4 { background: linear-gradient(135deg, #3D2B6B, #7B52C7); }
+  .city-card-head.c5 { background: linear-gradient(135deg, #0B3D4A, #1A7A8A); }
+  .city-card-head.c6 { background: linear-gradient(135deg, #4A3B0B, #8A7020); }
+  .city-card-head.c7 { background: linear-gradient(135deg, #1A2B3D, #2D5080); }
+  .city-card-head.c8 { background: linear-gradient(135deg, #2B3D1A, #4A7030); }
+
+  .city-card-body { padding: 16px 18px; }
+
+  .city-card-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 6px;
+  }
+
+  .city-card-detail {
+    font-size: 12.5px;
+    color: var(--text-light);
+    line-height: 1.55;
+  }
+
+  .city-tag {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sage);
+    background: rgba(107,143,113,0.08);
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+
+  /* ─── LAYER CARDS ─── */
+  .layer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .layer-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: background var(--transition), box-shadow var(--transition);
+  }
+
+  .layer-card:hover {
+    background: var(--forest);
+    box-shadow: 0 8px 24px rgba(28,58,42,0.2);
+  }
+
+  .layer-card:hover .layer-icon { filter: brightness(2); }
+  .layer-card:hover .layer-name { color: var(--sage-light); }
+  .layer-card:hover .layer-desc { color: rgba(168,197,160,0.7); }
+
+  .layer-icon { font-size: 28px; margin-bottom: 10px; line-height: 1; }
+
+  .layer-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 6px;
+    transition: color var(--transition);
+  }
+
+  .layer-desc {
+    font-size: 11.5px;
+    color: var(--text-light);
+    line-height: 1.5;
+    transition: color var(--transition);
+  }
+
+  /* ─── STAT BLOCKS ─── */
+  .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 28px 0;
+  }
+
+  .stat-block {
+    flex: 1;
+    min-width: 150px;
+    background: var(--forest);
+    color: white;
+    border-radius: 8px;
+    padding: 24px 22px;
+  }
+
+  .stat-block-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-block-label {
+    font-size: 11px;
+    color: rgba(168,197,160,0.65);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* ─── CITIZEN CARDS ─── */
+  .citizen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin: 24px 0;
+  }
+
+  .citizen-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 26px 22px;
+    background: white;
+  }
+
+  .citizen-icon { font-size: 32px; margin-bottom: 14px; }
+
+  .citizen-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 8px;
+  }
+
+  .citizen-card p { font-size: 13.5px; color: var(--text-light); line-height: 1.6; margin: 0; }
+
+  /* ─── AI FEATURE LIST ─── */
+  .ai-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .ai-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .ai-item-icon {
+    width: 36px; height: 36px;
+    background: rgba(107,143,113,0.1);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+
+  .ai-item-text h5 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--forest);
+    margin-bottom: 3px;
+  }
+
+  .ai-item-text p { font-size: 12px; color: var(--text-light); line-height: 1.5; margin: 0; }
+
+  /* ─── VISION BANNER ─── */
+  .vision-banner {
+    background: linear-gradient(135deg, var(--forest) 0%, var(--forest-mid) 100%);
+    border-radius: 10px;
+    padding: 40px 36px;
+    margin: 32px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vision-banner::before {
+    content: '🌿';
+    position: absolute;
+    right: 30px; top: 30px;
+    font-size: 80px;
+    opacity: 0.08;
+  }
+
+  .vision-banner h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .vision-banner p {
+    font-size: 14.5px;
+    color: rgba(168,197,160,0.7);
+    line-height: 1.7;
+    max-width: 580px;
+    margin: 0;
+  }
+
+  .vision-outcomes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .vision-outcome-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--amber);
+    line-height: 1;
+  }
+
+  .vision-outcome-label {
+    font-size: 11px;
+    color: rgba(168,197,160,0.55);
+    margin-top: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ─── SCROLLTOP BTN ─── */
+  #scroll-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 44px; height: 44px;
+    background: var(--forest);
+    color: var(--sage-light);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 4px 16px rgba(28,58,42,0.3);
+    z-index: 200;
+  }
+
+  #scroll-top.visible { opacity: 1; transform: translateY(0); }
+  #scroll-top:hover { background: var(--forest-mid); }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 0px; }
+
+    #sidebar { transform: translateX(-260px); transition: transform 0.35s ease; }
+    #sidebar.open { transform: translateX(0); width: 260px; }
+
+    #main { margin-left: 0; }
+
+    #menu-toggle {
+      display: flex;
+      position: fixed;
+      top: 14px; left: 14px;
+      z-index: 200;
+      background: var(--forest);
+      border: none;
+      border-radius: 6px;
+      width: 40px; height: 40px;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--sage-light);
+      font-size: 18px;
+    }
+
+    .chapter, #hero { padding: 56px 28px; }
+
+    .ai-list { grid-template-columns: 1fr; }
+    .carbon-row { grid-template-columns: 100px 1fr 90px; }
+  }
+
+  #menu-toggle { display: none; }
+
+  /* Divider */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0;
+    color: var(--text-light);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .section-divider::before, .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Blockquote */
+  blockquote {
+    border-left: 3px solid var(--sage);
+    padding: 14px 20px;
+    margin: 24px 0;
+    background: rgba(107,143,113,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+
+  blockquote p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px !important;
+    font-style: italic;
+    color: var(--forest) !important;
+    margin: 0 !important;
+    line-height: 1.6 !important;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<button id="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- ─── SIDEBAR ─── -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <span class="leaf-icon">🌿</span>
+    <h1>Kanyakubja<br>Restoration Initiative</h1>
+    <p>Kannauj · Uttar Pradesh · India</p>
+  </div>
+  <div id="nav-list">
+    <!-- Populated by JS -->
+  </div>
+  <div class="sidebar-footer">
+    <p>ECOLOGICAL MASTERPLAN REPORT</p>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<main id="main">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg-pattern"></div>
+    <svg class="hero-botanical" width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="250" cy="250" r="220" stroke="white" stroke-width="1" fill="none"/>
+      <circle cx="250" cy="250" r="180" stroke="white" stroke-width="0.5" fill="none"/>
+      <ellipse cx="250" cy="150" rx="40" ry="90" stroke="white" stroke-width="1" fill="none"/>
+      <ellipse cx="310" cy="200" rx="40" ry="90" transform="rotate(60 310 200)" stroke="white" stroke-width="1" fill="none"/>
+      <ellipse cx="310" cy="300" rx="40" ry="90" transform="rotate(120 310 300)" stroke="white" stroke-width="1" fill="none"/>
+      <ellipse cx="250" cy="350" rx="40" ry="90" stroke="white" stroke-width="1" fill="none"/>
+      <ellipse cx="190" cy="300" rx="40" ry="90" transform="rotate(60 190 300)" stroke="white" stroke-width="1" fill="none"/>
+      <ellipse cx="190" cy="200" rx="40" ry="90" transform="rotate(120 190 200)" stroke="white" stroke-width="1" fill="none"/>
+    </svg>
+    <div class="hero-content">
+      <div class="hero-tag">Ecological Urbanism</div>
+      <h2>Transforming Kannauj into a</h2>
+      <h1>Carbon-Negative<br><em>Biodiversity City</em></h1>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">150K</div>
+          <div class="hero-stat-label">Tonnes CO₂/yr<br>removed</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">6–8M</div>
+          <div class="hero-stat-label">Trees<br>to be planted</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">15 yrs</div>
+          <div class="hero-stat-label">Transformation<br>timeline</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">14</div>
+          <div class="hero-stat-label">Chapters &<br>interventions</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 1 -->
+  <section class="chapter" id="ch1" data-chapter="1">
+    <div class="chapter-header">
+      <div class="chapter-num">01</div>
+      <div class="chapter-title-block">
+        <h2>Introduction & Vision</h2>
+        <p class="chapter-subtitle">Why Kannauj, and why now</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Kannauj — historically known as <strong>Kanyakubja</strong> — was once one of the most influential cultural and political centers in northern India. Situated in the Gangetic plains, the city played a vital role in civilization, trade, and spiritual heritage.</p>
+      <blockquote><p>Today, the city has an opportunity to lead again — this time as a model for ecological restoration and sustainable urban development.</p></blockquote>
+      <p>The Kanyakubja Ecological Restoration Initiative proposes transforming Kannauj into a <strong>carbon-negative biodiversity city</strong> through large-scale, science-led ecological restoration. The initiative seeks to reconnect heritage, nature, and urban life while improving environmental resilience and public well-being.</p>
+      <div class="section-divider">Key Components</div>
+      <div class="pill-list">
+        <span class="pill"><span class="dot"></span>Urban Forests</span>
+        <span class="pill"><span class="dot"></span>Biodiversity Parks</span>
+        <span class="pill"><span class="dot"></span>Regenerative Agriculture</span>
+        <span class="pill"><span class="dot"></span>Wetland Restoration</span>
+        <span class="pill"><span class="dot"></span>Green Mobility</span>
+        <span class="pill"><span class="dot"></span>Climate-Positive Infrastructure</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 2 -->
+  <section class="chapter" id="ch2" data-chapter="2">
+    <div class="chapter-header">
+      <div class="chapter-num">02</div>
+      <div class="chapter-title-block">
+        <h2>Institutional Framework</h2>
+        <p class="chapter-subtitle">How the project is governed</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Large ecological projects in India typically succeed when three systems work in concert: <strong>government administration</strong>, <strong>corporate CSR funding</strong>, and <strong>carbon credit markets</strong>. The initiative is designed to activate all three.</p>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>🏛 District Level</h4>
+          <p>Led by the District Magistrate of Kannauj, with Nagar Palika Parishad, UP Forest Department, Rural Development, and Agriculture Departments.</p>
+        </div>
+        <div class="info-card">
+          <h4>🏗 State Level</h4>
+          <p>UP Pollution Control Board, State Climate Change Cell, and the Forest Department overseeing environmental regulation and climate planning.</p>
+        </div>
+        <div class="info-card">
+          <h4>🇮🇳 National Level</h4>
+          <p>MoEFCC, National Afforestation & Eco-Development Board, and NITI Aayog as potential national partners for scaling the pilot.</p>
+        </div>
+      </div>
+      <p>District administrations frequently launch environmental pilots that later scale to state and national programs. If successful, Kannauj could become a <strong>national model for ecological urban development</strong>.</p>
+    </div>
+  </section>
+
+  <!-- Ch 3 -->
+  <section class="chapter" id="ch3" data-chapter="3">
+    <div class="chapter-header">
+      <div class="chapter-num">03</div>
+      <div class="chapter-title-block">
+        <h2>Funding Model</h2>
+        <p class="chapter-subtitle">Government, CSR, and carbon markets</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>India mandates large companies to invest <strong>2% of profits on CSR</strong> activities. Ecological restoration is among the most impactful categories eligible for CSR spending.</p>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>🏢 Corporate CSR</h4>
+          <p>Potential partners include Reliance Industries, Tata Group, and ITC Limited — all active in afforestation, biodiversity, and water conservation programs.</p>
+        </div>
+        <div class="info-card">
+          <h4>📊 Carbon Credits</h4>
+          <p>India's national carbon trading system (Bureau of Energy Efficiency) allows restoration projects to generate tradeable credits. International registries include Verra and Gold Standard.</p>
+        </div>
+        <div class="info-card">
+          <h4>💰 Revenue Potential</h4>
+          <p>Estimated carbon credit revenue: <strong>₹5–18 crore per year</strong>, depending on market conditions and volume of verified carbon sequestration.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 4 -->
+  <section class="chapter" id="ch4" data-chapter="4">
+    <div class="chapter-header">
+      <div class="chapter-num">04</div>
+      <div class="chapter-title-block">
+        <h2>Ecological Restoration Blueprint</h2>
+        <p class="chapter-subtitle">Four landscape layers of intervention</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>The masterplan is structured into <strong>four landscape layers</strong>, each targeting a distinct ecological typology — together forming an integrated green infrastructure network across the city and surrounding district.</p>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>🌳 Urban Forest Network</h4>
+          <p>Plant 200–300 micro-forests using the Miyawaki method. Estimated 500,000 – 800,000 trees, creating dense multi-layered canopy at the neighborhood scale.</p>
+        </div>
+        <div class="info-card">
+          <h4>🦋 Biodiversity Parks</h4>
+          <p>3–5 large ecological parks across degraded land, featuring native forests, wetlands, butterfly gardens, and bird habitats.</p>
+        </div>
+        <div class="info-card">
+          <h4>🌾 Agroforestry Landscape</h4>
+          <p>Collaborate with farmers to plant 5–8 million trees across farmland, improving soil carbon, diversifying income, and creating wildlife corridors.</p>
+        </div>
+        <div class="info-card">
+          <h4>💧 River & Wetland Restoration</h4>
+          <p>Restore ecosystems connected to the Gangetic floodplain. Wetlands store 3–5× more carbon than forests, making this a critical component.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 5 -->
+  <section class="chapter" id="ch5" data-chapter="5">
+    <div class="chapter-header">
+      <div class="chapter-num">05</div>
+      <div class="chapter-title-block">
+        <h2>Urban Biodiversity Infrastructure</h2>
+        <p class="chapter-subtitle">Weaving ecology into city design</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Ecological design doesn't stop at parks — it can be woven into every street, canal, and public space. Kannauj's urban fabric offers multiple entry points for biodiversity infrastructure.</p>
+      <div class="layer-grid">
+        <div class="layer-card">
+          <div class="layer-icon">🌲</div>
+          <div class="layer-name">Green Streets</div>
+          <div class="layer-desc">Neem, jamun, arjun, banyan, peepal along major roads</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🚲</div>
+          <div class="layer-name">Biodiversity Boulevards</div>
+          <div class="layer-desc">Cycling lanes, canopy, rain gardens, pollinator habitat — reducing heat by 2–4°C</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🪷</div>
+          <div class="layer-name">Pond Network</div>
+          <div class="layer-desc">Historic ponds revived with lotus, aquatic plants, and bird islands</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🚶</div>
+          <div class="layer-name">Green Mobility</div>
+          <div class="layer-desc">Netherlands-inspired cycling and walking corridors</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🌸</div>
+          <div class="layer-name">Fragrance Gardens</div>
+          <div class="layer-desc">Jasmine, rose, mogra, kewra — honouring Kannauj's perfume heritage</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 6 — Carbon Viz -->
+  <section class="chapter" id="ch6" data-chapter="6">
+    <div class="chapter-header">
+      <div class="chapter-num">06</div>
+      <div class="chapter-title-block">
+        <h2>Carbon Sequestration Potential</h2>
+        <p class="chapter-subtitle">Climate impact estimates</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Across all four landscape layers, the initiative is projected to remove approximately <strong>150,000 tonnes of CO₂ annually</strong> once fully operational — enough to make Kannauj a carbon-negative city.</p>
+      <div class="carbon-viz" id="carbon-viz">
+        <h3>Annual Carbon Removal by Landscape Layer</h3>
+        <div class="carbon-row">
+          <div class="carbon-label">Urban Forests</div>
+          <div class="carbon-bar-track">
+            <div class="carbon-bar-fill urban" data-target="13" style="width:0%"></div>
+          </div>
+          <div class="carbon-value">≈ 20,000 t</div>
+        </div>
+        <div class="carbon-row">
+          <div class="carbon-label">Agroforestry</div>
+          <div class="carbon-bar-track">
+            <div class="carbon-bar-fill agro" data-target="67" style="width:0%"></div>
+          </div>
+          <div class="carbon-value">≈ 100,000 t</div>
+        </div>
+        <div class="carbon-row">
+          <div class="carbon-label">Wetlands</div>
+          <div class="carbon-bar-track">
+            <div class="carbon-bar-fill wet" data-target="20" style="width:0%"></div>
+          </div>
+          <div class="carbon-value">≈ 30,000 t</div>
+        </div>
+        <div class="carbon-total-box">
+          <div>
+            <div class="carbon-total-label">Total annual removal</div>
+            <div class="carbon-total-num">150,000 t CO₂</div>
+            <div class="carbon-total-sub">Revenue potential: ₹5–18 crore/year</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 7 -->
+  <section class="chapter" id="ch7" data-chapter="7">
+    <div class="chapter-header">
+      <div class="chapter-num">07</div>
+      <div class="chapter-title-block">
+        <h2>International Model Cities</h2>
+        <p class="chapter-subtitle">Global precedents to draw from</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Several cities worldwide have demonstrated that ecological urbanism at scale is both possible and transformative. These examples offer a blueprint for Kannauj's ambitions.</p>
+      <div class="city-grid">
+        <div class="city-card">
+          <div class="city-card-head c1">🇩🇰</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Copenhagen</div>
+            <div class="city-card-detail">World-class cycling infrastructure and climate-neutral urban planning. Set the global standard for sustainable mobility.</div>
+            <div class="city-tag">Mobility</div>
+          </div>
+        </div>
+        <div class="city-card">
+          <div class="city-card-head c2">🇸🇬</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Singapore</div>
+            <div class="city-card-detail">The "City in Nature" — vertical gardens, green buildings, biodiversity corridors woven into an ultra-dense metropolis.</div>
+            <div class="city-tag">Urban Nature</div>
+          </div>
+        </div>
+        <div class="city-card">
+          <div class="city-card-head c3">🇨🇴</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Medellín</div>
+            <div class="city-card-detail">Famous for green corridors and community-centered urbanism — reduced urban temperatures dramatically.</div>
+            <div class="city-tag">Green Corridors</div>
+          </div>
+        </div>
+        <div class="city-card">
+          <div class="city-card-head c4">🇮🇹</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Milan</div>
+            <div class="city-card-detail">Home to the iconic Bosco Verticale — forest towers that redefined what buildings can mean for biodiversity.</div>
+            <div class="city-tag">Vertical Forest</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 8 -->
+  <section class="chapter" id="ch8" data-chapter="8">
+    <div class="chapter-header">
+      <div class="chapter-num">08</div>
+      <div class="chapter-title-block">
+        <h2>Indian Model Examples</h2>
+        <p class="chapter-subtitle">Proven precedents closer to home</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>India has its own growing body of ecological success stories — cities and institutions demonstrating what large-scale restoration looks like in the Indian context.</p>
+      <div class="city-grid">
+        <div class="city-card">
+          <div class="city-card-head c5">🏙</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Delhi Biodiversity Parks</div>
+            <div class="city-card-detail">Restored ecosystems along the Yamuna floodplain — transforming degraded land into rich habitats.</div>
+            <div class="city-tag">Floodplain</div>
+          </div>
+        </div>
+        <div class="city-card">
+          <div class="city-card-head c6">🌳</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Mumbai & Pune</div>
+            <div class="city-card-detail">Miyawaki micro-forests successfully deployed in urban neighborhoods — now replicable across Indian cities.</div>
+            <div class="city-tag">Miyawaki</div>
+          </div>
+        </div>
+        <div class="city-card">
+          <div class="city-card-head c7">💧</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Indore</div>
+            <div class="city-card-detail">Major improvements in water management and lake ecology, demonstrating the viability of urban water restoration.</div>
+            <div class="city-tag">Water Systems</div>
+          </div>
+        </div>
+        <div class="city-card">
+          <div class="city-card-head c8">🌿</div>
+          <div class="city-card-body">
+            <div class="city-card-name">Chandigarh</div>
+            <div class="city-card-detail">A classic example of planned, tree-lined urban design — proving that green infrastructure is a planning choice.</div>
+            <div class="city-tag">Urban Planning</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 9 -->
+  <section class="chapter" id="ch9" data-chapter="9">
+    <div class="chapter-header">
+      <div class="chapter-num">09</div>
+      <div class="chapter-title-block">
+        <h2>Citizen Participation</h2>
+        <p class="chapter-subtitle">Community as the backbone of restoration</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Ecological restoration succeeds or fails at the community level. Resident ownership and civic pride transform a government project into a living, breathing movement.</p>
+      <div class="citizen-grid">
+        <div class="citizen-card">
+          <div class="citizen-icon">🌱</div>
+          <h4>Tree Guardians</h4>
+          <p>Residents formally adopt individual trees, taking responsibility for watering, protection, and monitoring their survival and growth.</p>
+        </div>
+        <div class="citizen-card">
+          <div class="citizen-icon">🏫</div>
+          <h4>School Forests</h4>
+          <p>Students maintain micro-forests on school grounds — building ecological awareness and a generation-long relationship with local biodiversity.</p>
+        </div>
+        <div class="citizen-card">
+          <div class="citizen-icon">🦋</div>
+          <h4>Biodiversity Monitoring</h4>
+          <p>Citizens track bird, butterfly, and insect populations through mobile apps — turning everyday observation into scientific data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 10 -->
+  <section class="chapter" id="ch10" data-chapter="10">
+    <div class="chapter-header">
+      <div class="chapter-num">10</div>
+      <div class="chapter-title-block">
+        <h2>Long-Term Vision</h2>
+        <p class="chapter-subtitle">What Kannauj becomes in 15 years</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <div class="vision-banner">
+        <h3>India's first carbon-negative heritage city.</h3>
+        <p>Within 15 years, Kannauj could stand as a biodiversity hotspot in the Gangetic plains — a globally recognized model that proves ecological restoration and heritage preservation are not competing goals, but one unified vision.</p>
+        <div class="vision-outcomes">
+          <div>
+            <div class="vision-outcome-num">6–8M</div>
+            <div class="vision-outcome-label">Trees planted</div>
+          </div>
+          <div>
+            <div class="vision-outcome-num">150K</div>
+            <div class="vision-outcome-label">Tonnes CO₂/yr</div>
+          </div>
+          <div>
+            <div class="vision-outcome-num">25–30%</div>
+            <div class="vision-outcome-label">Forest cover</div>
+          </div>
+          <div>
+            <div class="vision-outcome-num">★</div>
+            <div class="vision-outcome-label">Intl recognition</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 11 -->
+  <section class="chapter" id="ch11" data-chapter="11">
+    <div class="chapter-header">
+      <div class="chapter-num">11</div>
+      <div class="chapter-title-block">
+        <h2>Seven Landscape Interventions</h2>
+        <p class="chapter-subtitle">Design strategies that maximize biodiversity</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>These seven interventions form the spine of the ecological masterplan — each addressing a different spatial typology and together creating a city where biodiversity and urban life are inseparable.</p>
+      <div class="layer-grid">
+        <div class="layer-card">
+          <div class="layer-icon">🌲</div>
+          <div class="layer-name">Micro-Forest Networks</div>
+          <div class="layer-desc">Dense urban micro-forests using Miyawaki method</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🛣</div>
+          <div class="layer-name">Green Street Corridors</div>
+          <div class="layer-desc">Tree-lined arteries connecting the city</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">💧</div>
+          <div class="layer-name">Blue-Green Water Systems</div>
+          <div class="layer-desc">Integrated ponds, wetlands, and canals</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🦚</div>
+          <div class="layer-name">Biodiversity Parks</div>
+          <div class="layer-desc">Large core habitat zones</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🌾</div>
+          <div class="layer-name">Agroforestry Corridors</div>
+          <div class="layer-desc">Trees integrated into farmland surrounding the city</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🌸</div>
+          <div class="layer-name">Pollinator Gardens</div>
+          <div class="layer-desc">Fragrance and flower landscapes honouring local culture</div>
+        </div>
+        <div class="layer-card">
+          <div class="layer-icon">🚲</div>
+          <div class="layer-name">Greenways</div>
+          <div class="layer-desc">Bicycle and walking routes through ecological land</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 12 -->
+  <section class="chapter" id="ch12" data-chapter="12">
+    <div class="chapter-header">
+      <div class="chapter-num">12</div>
+      <div class="chapter-title-block">
+        <h2>AI for Ecological Governance</h2>
+        <p class="chapter-subtitle">Technology in service of nature</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Artificial intelligence can substantially improve the efficiency, monitoring accuracy, and transparency of the restoration programme — from satellite analysis to citizen reporting platforms.</p>
+      <div class="ai-list">
+        <div class="ai-item">
+          <div class="ai-item-icon">🛰</div>
+          <div class="ai-item-text">
+            <h5>Environmental Monitoring</h5>
+            <p>Satellite analysis of forests and wetland cover change over time</p>
+          </div>
+        </div>
+        <div class="ai-item">
+          <div class="ai-item-icon">🌳</div>
+          <div class="ai-item-text">
+            <h5>Tree Monitoring</h5>
+            <p>Tracking individual tree growth and survival at scale</p>
+          </div>
+        </div>
+        <div class="ai-item">
+          <div class="ai-item-icon">📊</div>
+          <div class="ai-item-text">
+            <h5>Smart Dashboards</h5>
+            <p>Real-time project metrics for administrators and the public</p>
+          </div>
+        </div>
+        <div class="ai-item">
+          <div class="ai-item-icon">🤖</div>
+          <div class="ai-item-text">
+            <h5>AI Field Agents</h5>
+            <p>Coordinating field operations and automated reporting workflows</p>
+          </div>
+        </div>
+        <div class="ai-item">
+          <div class="ai-item-icon">💨</div>
+          <div class="ai-item-text">
+            <h5>Carbon Accounting</h5>
+            <p>Automated and verifiable carbon sequestration calculations</p>
+          </div>
+        </div>
+        <div class="ai-item">
+          <div class="ai-item-icon">📱</div>
+          <div class="ai-item-text">
+            <h5>Citizen Platforms</h5>
+            <p>Mobile apps for reporting biodiversity sightings and tree health</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 13 -->
+  <section class="chapter" id="ch13" data-chapter="13">
+    <div class="chapter-header">
+      <div class="chapter-num">13</div>
+      <div class="chapter-title-block">
+        <h2>Implementation Roadmap</h2>
+        <p class="chapter-subtitle">A phased 15-year plan</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>The initiative unfolds in three distinct phases — each building on the last, with increasing ecological connectivity and international visibility as the programme matures.</p>
+      <div class="timeline" id="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"><span></span></div>
+          <div class="tl-phase">Phase 1 · Years 1–3</div>
+          <div class="tl-title">Pilot & Foundation</div>
+          <div class="tl-body">Launch pilot micro-forests using the Miyawaki method, begin pond restoration in historically significant water bodies, and establish the first biodiversity parks on degraded land.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Micro-forests</span>
+            <span class="tl-tag">Pond restoration</span>
+            <span class="tl-tag">Biodiversity parks</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"><span></span></div>
+          <div class="tl-phase">Phase 2 · Years 4–8</div>
+          <div class="tl-title">Expansion & Market Entry</div>
+          <div class="tl-body">Scale agroforestry partnerships with surrounding farmers, develop citywide tree corridors along major roads and waterways, and register verified carbon credits on national and international registries.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Agroforestry</span>
+            <span class="tl-tag">Tree corridors</span>
+            <span class="tl-tag">Carbon credits</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"><span></span></div>
+          <div class="tl-phase">Phase 3 · Years 9–15</div>
+          <div class="tl-title">Maturity & Recognition</div>
+          <div class="tl-body">Achieve full ecological connectivity across the district, document measurable biodiversity recovery, and position Kannauj as an internationally recognized model of heritage ecological urbanism.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Full connectivity</span>
+            <span class="tl-tag">Biodiversity recovery</span>
+            <span class="tl-tag">International recognition</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ch 14 -->
+  <section class="chapter" id="ch14" data-chapter="14">
+    <div class="chapter-header">
+      <div class="chapter-num">14</div>
+      <div class="chapter-title-block">
+        <h2>Spatial Planning & Landscape Mapping</h2>
+        <p class="chapter-subtitle">Where and how restoration happens, on the ground</p>
+      </div>
+    </div>
+    <div class="chapter-body">
+      <p>Ecological restoration projects succeed when they are <strong>strategically mapped</strong> — ensuring forests, water systems, farmland, and urban green spaces function as a connected network rather than isolated interventions.</p>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>🗺 Urban Green Network</h4>
+          <p>A citywide plan placing micro-forests, parks, and tree corridors so that every neighborhood is within 5–10 minutes walking distance of green space.</p>
+        </div>
+        <div class="info-card">
+          <h4>🌊 River & Floodplain Map</h4>
+          <p>Restoration along the Gangetic floodplain with wetland buffers, native vegetation, fish habitats, and eco-tourism trails — also preventing urban flooding.</p>
+        </div>
+        <div class="info-card">
+          <h4>🌾 Agricultural Landscape</h4>
+          <p>Agroforestry corridors through the rural ring — tree rows, fruit plantations, medicinal plants — creating a green buffer around the city.</p>
+        </div>
+        <div class="info-card">
+          <h4>🏞 Historic Pond Survey</h4>
+          <p>A spatial inventory of existing, dried, and encroached water bodies — basis for restoring a distributed water ecosystem network.</p>
+        </div>
+        <div class="info-card">
+          <h4>🌡 Climate Resilience Zones</h4>
+          <p>AI-assisted mapping of heat islands, flood risk, and groundwater stress — directing green infrastructure investment to where it is most needed.</p>
+        </div>
+        <div class="info-card">
+          <h4>🦅 Biodiversity Corridors</h4>
+          <p>Linking parks and forests via roadside plantations, canal-side tree belts, and riverbank vegetation — enabling safe wildlife movement across the city.</p>
+        </div>
+      </div>
+      <div class="section-divider">Masterplan Map Layers</div>
+      <div class="pill-list">
+        <span class="pill"><span class="dot"></span>Urban forests & micro-forests</span>
+        <span class="pill"><span class="dot"></span>Biodiversity parks</span>
+        <span class="pill"><span class="dot"></span>Agroforestry landscapes</span>
+        <span class="pill"><span class="dot"></span>Wetlands & water bodies</span>
+        <span class="pill"><span class="dot"></span>Green mobility corridors</span>
+        <span class="pill"><span class="dot"></span>Pollinator landscapes</span>
+        <span class="pill"><span class="dot"></span>Climate resilience zones</span>
+      </div>
+      <div class="vision-banner" style="margin-top:36px">
+        <h3>A living ecological landscape.</h3>
+        <p>By combining ecological restoration, community participation, advanced technology, and strategic spatial planning, the historic city of Kannauj can become a <strong style="color:var(--sage-light)">global symbol of sustainable heritage cities</strong> — proving that the future of urban development and the wisdom of the past are not in conflict, but deeply aligned.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+// ─── NAV DATA ───
+const chapters = [
+  { id:'ch1',  num:'01', label:'Introduction & Vision' },
+  { id:'ch2',  num:'02', label:'Institutional Framework' },
+  { id:'ch3',  num:'03', label:'Funding Model' },
+  { id:'ch4',  num:'04', label:'Ecological Blueprint' },
+  { id:'ch5',  num:'05', label:'Urban Biodiversity Infra' },
+  { id:'ch6',  num:'06', label:'Carbon Sequestration' },
+  { id:'ch7',  num:'07', label:'International Models' },
+  { id:'ch8',  num:'08', label:'Indian Model Examples' },
+  { id:'ch9',  num:'09', label:'Citizen Participation' },
+  { id:'ch10', num:'10', label:'Long-Term Vision' },
+  { id:'ch11', num:'11', label:'Seven Interventions' },
+  { id:'ch12', num:'12', label:'AI for Governance' },
+  { id:'ch13', num:'13', label:'Implementation Roadmap' },
+  { id:'ch14', num:'14', label:'Spatial Planning & Mapping' },
+];
+
+// ─── BUILD NAV ───
+const navList = document.getElementById('nav-list');
+chapters.forEach(ch => {
+  const el = document.createElement('div');
+  el.className = 'nav-item';
+  el.dataset.target = ch.id;
+  el.innerHTML = `<span class="nav-num">${ch.num}</span><span class="nav-label">${ch.label}</span>`;
+  el.addEventListener('click', () => {
+    document.getElementById(ch.id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    closeSidebar();
+  });
+  navList.appendChild(el);
+});
+
+// ─── SCROLL LOGIC ───
+const progressBar = document.getElementById('progress-bar');
+const scrollTopBtn = document.getElementById('scroll-top');
+const allChapters = document.querySelectorAll('.chapter');
+const navItems = document.querySelectorAll('.nav-item');
+
+let carbonAnimated = false;
+let timelineAnimated = false;
+
+function onScroll() {
+  const scrolled = window.scrollY;
+  const total = document.body.scrollHeight - window.innerHeight;
+  progressBar.style.width = (scrolled / total * 100) + '%';
+
+  // Scroll-to-top btn
+  scrollTopBtn.classList.toggle('visible', scrolled > 400);
+
+  // Chapter fade-in
+  allChapters.forEach(ch => {
+    const rect = ch.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.88) {
+      ch.classList.add('visible');
+    }
+  });
+
+  // Active nav highlight
+  let active = null;
+  chapters.forEach(ch => {
+    const el = document.getElementById(ch.id);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      if (rect.top <= window.innerHeight * 0.4) active = ch.id;
+    }
+  });
+  navItems.forEach(item => {
+    item.classList.toggle('active', item.dataset.target === active);
+    if (item.dataset.target === active) {
+      item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  });
+
+  // Carbon bars
+  if (!carbonAnimated) {
+    const viz = document.getElementById('carbon-viz');
+    if (viz && viz.getBoundingClientRect().top < window.innerHeight * 0.85) {
+      carbonAnimated = true;
+      document.querySelectorAll('.carbon-bar-fill').forEach(bar => {
+        bar.style.width = bar.dataset.target + '%';
+      });
+    }
+  }
+
+  // Timeline items
+  if (!timelineAnimated) {
+    const tl = document.getElementById('timeline');
+    if (tl && tl.getBoundingClientRect().top < window.innerHeight * 0.85) {
+      timelineAnimated = true;
+      document.querySelectorAll('.tl-item').forEach(item => {
+        item.classList.add('visible');
+      });
+    }
+  }
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll(); // run once on load
+
+// ─── MOBILE SIDEBAR ───
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+}
+</script>
+
+</body>
+</html>
